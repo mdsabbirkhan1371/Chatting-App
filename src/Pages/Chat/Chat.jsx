@@ -1,9 +1,16 @@
+import ChatBox from '../../Components/ChatBox/ChatBox';
+import LeftSideBar from '../../Components/LeftSideBar/LeftSideBar';
+import RightSideBar from '../../Components/RightSideBar/RightSideBar';
 import './Chat.css';
 
 const Chat = () => {
   return (
-    <div>
-      <h2>We are on the Chat Page</h2>
+    <div className="chat">
+      <div className="chat-container">
+        <LeftSideBar></LeftSideBar>
+        <ChatBox></ChatBox>
+        <RightSideBar></RightSideBar>
+      </div>
     </div>
   );
 };
