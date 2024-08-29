@@ -1,42 +1,17 @@
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import assets from '../../assets/assets';
 import './Login.css';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../Config/firebase.config';
+import { AppContext } from '../../Context/AppContextProvider/AppContextProvider';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Sign Up');
 
+  // from context auth
+  const { signUp, signIn } = useContext(AppContext);
+
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-
-  // create user with email and password
-  const signUp = (username, email, password) => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async res => {
-        const user = res.user;
-        console.log(user);
-
-        await setDoc(doc(db, 'users', user.uid), {
-          id: user.uid,
-          username: username.toLowerCase(),
-          email,
-          name: '',
-          avatar: '',
-          bio: 'Hey, I am using Chat app',
-          lastSeen: Date.now(),
-        });
-        await setDoc(doc(db, 'chats', user.uid), {
-          chatData: [],
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  };
 
   const handleSubmit = event => {
     event.preventDefault(); // Prevent page reload
@@ -54,6 +29,7 @@ const Login = () => {
       signUp(username, email, password);
     } else {
       console.log('Logging in...');
+      signIn(email, password);
     }
   };
 

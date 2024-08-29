@@ -1,7 +1,10 @@
+import { useContext } from 'react';
 import assets from '../../assets/assets';
 import './RightSideBar.css';
+import { AppContext } from '../../Context/AppContextProvider/AppContextProvider';
 
 const RightSideBar = () => {
+  const { logOut } = useContext(AppContext);
   return (
     <div className="right-side">
       <div className="rs-profile">
@@ -22,7 +25,7 @@ const RightSideBar = () => {
           <img src={assets.pic1} alt="" />
           <img src={assets.pic2} alt="" />
         </div>
-        <button>Logout</button>
+        <button onClick={() => logOut()}>Logout</button>
       </div>
     </div>
   );
