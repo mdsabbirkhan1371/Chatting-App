@@ -7,7 +7,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { auth, db } from '../../Config/firebase.config';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,6 +49,27 @@ const AppContextProvider = ({ children }) => {
       console.error(error);
     }
   };
+
+  // for chatting next
+  useEffect(() => {
+    if (userData) {
+      const chatRef = doc(db, 'chats', userData.id);
+      const unSub = onSnapshot(chatRef, async res => {
+        const chatItems = res.data()?.chatData;
+        const tempData = [];
+        for (const item of chatItems) {
+          const userRef = doc(db, 'users', item.rId);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.data();
+          tempData.push({ ...item, userData });
+        }
+        setChatData(tempData.sort((a, b) => b.updatedAt - a.updatedAt));
+      });
+      return () => {
+        unSub();
+      };
+    }
+  }, [userData]);
 
   // create user with email and password
 
@@ -99,7 +120,7 @@ const AppContextProvider = ({ children }) => {
   useEffect(() => {
     onAuthStateChanged(auth, async user => {
       if (user) {
-        console.log(user);
+        // console.log(user);
         navigate('/chat');
         await loadUserData(user.uid);
       } else {
