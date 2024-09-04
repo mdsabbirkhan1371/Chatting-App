@@ -20,6 +20,12 @@ const AppContextProvider = ({ children }) => {
 
   const [userData, setUserData] = useState(null);
   const [chatData, setChatData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [chatUser, setChatUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [messagesId, setMessagesId] = useState(null);
+
   const navigate = useNavigate();
 
   // chatting related
@@ -64,6 +70,7 @@ const AppContextProvider = ({ children }) => {
           tempData.push({ ...item, userData });
         }
         setChatData(tempData.sort((a, b) => b.updatedAt - a.updatedAt));
+        // setIsLoading(false);
       });
       return () => {
         unSub();
@@ -150,6 +157,14 @@ const AppContextProvider = ({ children }) => {
     userData,
     chatData,
     loadUserData,
+    isLoading,
+    setIsLoading,
+    chatUser,
+    setChatUser,
+    messagesId,
+    setMessagesId,
+    messages,
+    setMessages,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
