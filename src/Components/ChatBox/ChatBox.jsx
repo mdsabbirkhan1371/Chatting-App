@@ -67,6 +67,19 @@ const ChatBox = () => {
       console.error(error);
       toast.error(error.message);
     }
+    setInput('');
+  };
+
+  // time stand fun
+  const convertTimeStand = timesTamp => {
+    let date = timesTamp.toDate();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    if (hour > 12) {
+      return hour - 12 + ':' + minute + 'PM';
+    } else {
+      return hour + ':' + minute + 'AM';
+    }
   };
 
   return chatUser ? (
@@ -83,27 +96,25 @@ const ChatBox = () => {
 
       {/* message side or middle side  */}
       <div className="chat-msg">
-        <div className="sender-msg">
-          <p className="message">Hello Babe</p>
-          <div>
-            <img src={assets.profile_img} alt="" />
-            <p>2:40 PM</p>
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={msg.sId === userData.id ? 'sender-msg' : 'receiver-msg'}
+          >
+            <p className="message">{msg.text}</p>
+            <div>
+              <img
+                src={
+                  msg.sId === userData.id
+                    ? userData.avatar
+                    : chatUser.userData.avatar
+                }
+                alt=""
+              />
+              <p>{convertTimeStand(msg.createdAt)}</p>
+            </div>
           </div>
-        </div>
-        <div className="sender-msg">
-          <img className="msg-img" src={assets.pic1} alt="" />
-          <div>
-            <img src={assets.profile_img} alt="" />
-            <p>2:40 PM</p>
-          </div>
-        </div>
-        <div className="receiver-msg">
-          <p className="message">Hello Babe</p>
-          <div>
-            <img src={assets.profile_img} alt="" />
-            <p>2:40 PM</p>
-          </div>
-        </div>
+        ))}
       </div>
       {/* lower side  */}
       <div className="chat-input">
