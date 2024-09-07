@@ -115,3 +115,11 @@
 .menu:hover .sub-menu {
   display: block;
 }
+
+.friends.border img {
+  border: 3px solid cyan;
+}
+
+.friends.border div span {
+  color: cyan;
+}

@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../Config/firebase.config';
 import { toast } from 'react-toastify';
+import upload from '../../Lib/upload';
 
 const ChatBox = () => {
   const { userData, messagesId, chatUser, messages, setMessages } =
@@ -30,7 +31,7 @@ const ChatBox = () => {
     }
   }, [messagesId]);
 
-  // get input message and send to fbd
+  // get input message and send to fbd send msg to chat
 
   const sendMessage = async () => {
     try {
@@ -42,6 +43,7 @@ const ChatBox = () => {
             createdAt: new Date(),
           }),
         });
+
         const userIDs = [chatUser.rId, userData.id];
 
         userIDs.forEach(async id => {
@@ -68,6 +70,44 @@ const ChatBox = () => {
       toast.error(error.message);
     }
     setInput('');
+  };
+
+  // send image to chat
+  const sendImageToChat = async e => {
+    try {
+      const fileUrl = await upload(e.target.files[0]);
+      if (fileUrl && messagesId) {
+        await updateDoc(doc(db, 'messages', messagesId), {
+          messages: arrayUnion({
+            sId: userData.id,
+            image: fileUrl,
+            createdAt: new Date(),
+          }),
+        });
+        const userIDs = [chatUser.rId, userData.id];
+
+        userIDs.forEach(async id => {
+          const userChatsRef = doc(db, 'chats', id);
+          const userChatsSnapShot = await getDoc(userChatsRef);
+          if (userChatsSnapShot.exists()) {
+            const userChatData = userChatsSnapShot.data();
+            const chatIndex = userChatData.chatData.findIndex(
+              c => c.messageId === messagesId
+            );
+            userChatData.chatData[chatIndex].lastMessage = 'Image';
+            userChatData.chatData[chatIndex].updatedAt = Date.now();
+            if (userChatData.chatData[chatIndex].rId === userData.id) {
+              userChatData.chatData[chatIndex].messageSeen = false;
+            }
+            await updateDoc(userChatsRef, {
+              chatData: userChatData.chatData,
+            });
+          }
+        });
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // time stand fun
@@ -101,7 +141,11 @@ const ChatBox = () => {
             key={index}
             className={msg.sId === userData.id ? 'sender-msg' : 'receiver-msg'}
           >
-            <p className="message">{msg.text}</p>
+            {msg['image'] ? (
+              <img className="msg-image" src={msg.image} />
+            ) : (
+              <p className="message">{msg.text}</p>
+            )}
             <div>
               <img
                 src={
@@ -126,7 +170,13 @@ const ChatBox = () => {
           name=""
           id=""
         />
-        <input type="file" id="image" accept="image/jpeg,image/png" hidden />
+        <input
+          onChange={sendImageToChat}
+          type="file"
+          id="image"
+          accept="image/jpeg,image/png"
+          hidden
+        />
         <label htmlFor="image">
           <img src={assets.gallery_icon} alt="" />
         </label>
