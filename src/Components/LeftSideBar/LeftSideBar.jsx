@@ -7,6 +7,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -101,6 +102,19 @@ const LeftSideBar = () => {
     // console.log(item);
     setMessagesId(item.messageId);
     setChatUser(item);
+
+    // after seen the message updated  for pic
+    const userChatsRef = doc(db, 'chats', userData.id);
+    const userChatsSnapShot = await getDoc(userChatsRef);
+    const userChatsData = userChatsSnapShot.data();
+
+    const chatIndex = userChatsData.chatData.findIndex(
+      c => c.messageId === item.messageId
+    );
+    userChatsData.chatData[chatIndex].messageSeen = true;
+    await updateDoc(userChatsRef, {
+      chatData: userChatsData.chatData,
+    });
   };
 
   return (
