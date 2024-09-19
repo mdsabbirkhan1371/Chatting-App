@@ -48,7 +48,7 @@ const RightSideBar = () => {
     </div>
   ) : (
     <div className="right-side">
-      <button>LogOut</button>
+      <button onClick={() => logOut()}>LogOut</button>
     </div>
   );
 };
