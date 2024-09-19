@@ -7,7 +7,7 @@ const Login = () => {
   const [currentState, setCurrentState] = useState('Sign Up');
 
   // from context auth
-  const { signUp, signIn } = useContext(AppContext);
+  const { signUp, signIn, resetPass } = useContext(AppContext);
 
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
@@ -83,6 +83,15 @@ const Login = () => {
               </span>
             </p>
           )}
+          {currentState === 'Login' ? (
+            <p className="login-toggle">
+              Forget Password?
+              <span onClick={() => resetPass(emailRef.current.value)}>
+                {' '}
+                Reset now
+              </span>
+            </p>
+          ) : null}
         </div>
       </form>
     </div>

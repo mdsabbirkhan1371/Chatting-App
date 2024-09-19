@@ -3,11 +3,22 @@ import PropTypes from 'prop-types';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
 import { auth, db } from '../../Config/firebase.config';
-import { doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,6 +36,7 @@ const AppContextProvider = ({ children }) => {
   const [chatUser, setChatUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messagesId, setMessagesId] = useState(null);
+  const [chatVisible, setChatVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -148,7 +160,31 @@ const AppContextProvider = ({ children }) => {
       });
   };
 
+  // reset password with email
+
+  const resetPass = async email => {
+    if (!email) {
+      toast.error('Enter Your Email First');
+      return null;
+    }
+    try {
+      const userRef = collection(db, 'users');
+      const q = query(userRef, where('email', '==', email));
+      const querySnap = await getDocs(q);
+      if (!querySnap.empty) {
+        await sendPasswordResetEmail(auth, email);
+        toast.success('Please check your email to reset pass');
+      } else {
+        toast.error('Email does not Exist');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.messages);
+    }
+  };
+
   const value = {
+    resetPass,
     signUp,
     signIn,
     logOut,
@@ -165,6 +201,8 @@ const AppContextProvider = ({ children }) => {
     setMessagesId,
     messages,
     setMessages,
+    chatVisible,
+    setChatVisible,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -72,3 +72,9 @@
   font-size: 12px;
   font-weight: 300;
 }
+
+@media (max-width: 900px) {
+  .right-side {
+    display: none;
+  }
+}

@@ -1,32 +1,54 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import assets from '../../assets/assets';
 import './RightSideBar.css';
 import { AppContext } from '../../Context/AppContextProvider/AppContextProvider';
 
 const RightSideBar = () => {
-  const { logOut } = useContext(AppContext);
-  return (
+  const { logOut, chatUser, messages } = useContext(AppContext);
+  // for store the message images in user base in media
+  const [msgImages, setMsgImages] = useState([]);
+
+  useEffect(() => {
+    let msgImageStore = [];
+    messages.map(msg => {
+      if (msg.image) {
+        msgImageStore.push(msg.image);
+      }
+    });
+    setMsgImages(msgImageStore);
+  }, [messages]);
+  return chatUser ? (
     <div className="right-side">
       <div className="rs-profile">
-        <img src={assets.profile_img} alt="" />
+        <img src={chatUser.userData.avatar} alt="" />
         <h3>
-          Richard Sanford <img className="dot" src={assets.green_dot} alt="" />
+          {chatUser.userData.name}
+          {Date.now() - chatUser.userData.lastSeen <= 70000 ? (
+            <img className="dot" src={assets.green_dot} alt="" />
+          ) : null}
         </h3>
-        <p>Hey,there i am Richard Sanford using chat app</p>
+        <p>{chatUser.userData.bio}</p>
       </div>
       <hr />
       <div className="rs-media">
         <p>Media</p>
         <div>
-          <img src={assets.pic1} alt="" />
+          {msgImages.map((url, index) => (
+            <img key={index} onClick={() => window.open(url)} src={url} />
+          ))}
+          {/* <img src={assets.pic1} alt="" />
           <img src={assets.pic2} alt="" />
           <img src={assets.pic3} alt="" />
           <img src={assets.pic4} alt="" />
           <img src={assets.pic1} alt="" />
-          <img src={assets.pic2} alt="" />
+          <img src={assets.pic2} alt="" /> */}
         </div>
-        <button onClick={() => logOut()}>Logout</button>
+        <button onClick={() => logOut()}>LogOut</button>
       </div>
+    </div>
+  ) : (
+    <div className="right-side">
+      <button>LogOut</button>
     </div>
   );
 };
